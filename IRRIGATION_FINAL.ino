@@ -1,4 +1,3 @@
-// ================== LIBRARIES ==================
 #include <WiFi.h>
 #include <WebServer.h>
 #include <HTTPClient.h>
@@ -6,15 +5,12 @@
 #include <WiFiClientSecure.h>
 #include <DHT.h>
 
-// ================== WIFI ==================
-const char* ssid = "Rajesh";
-const char* password = "12345678";
+const char* ssid = "";
+const char* password = "";
 
-// ================== WEATHER ==================
-String apiKey = "53d2dfc58d84c5c47c34b8a7a3df579e";
-String city = "Thanjavur,IN";
+String apiKey = "";
+String city = "";
 
-// ================== PINS ==================
 #define SOIL_PIN 34
 #define RAIN_PIN 35
 #define RELAY_PIN 26
@@ -23,10 +19,8 @@ String city = "Thanjavur,IN";
 #define DHTTYPE DHT11
 DHT dht(DHT_PIN, DHTTYPE);
 
-// ================== SERVER ==================
 WebServer server(80);
 
-// ================== VARIABLES ==================
 float temp = 0, hum = 0;
 int soil = 0, rain = 0;
 
@@ -39,7 +33,6 @@ bool autoMode = true;
 bool wifiOK = false;
 bool apiOK = false;
 
-// ================== WIFI ==================
 void connectWiFi() {
   WiFi.begin(ssid, password);
   Serial.print("Connecting WiFi");
@@ -60,7 +53,6 @@ void connectWiFi() {
   }
 }
 
-// ================== WEATHER ==================
 void fetchWeather() {
   if (!wifiOK) return;
 
@@ -94,7 +86,6 @@ void fetchWeather() {
   }
 }
 
-// ================== SENSOR ==================
 void readSensors() {
   soil = analogRead(SOIL_PIN);
   rain = analogRead(RAIN_PIN);
@@ -106,7 +97,6 @@ void readSensors() {
   if (isnan(hum)) hum = 0;
 }
 
-// ================== LOGIC ==================
 void controlPump() {
   bool dry = soil > 2500;
   bool raining = rain < 2000;
@@ -121,7 +111,6 @@ void controlPump() {
   digitalWrite(RELAY_PIN, pump ? LOW : HIGH);
 }
 
-// ================== DASHBOARD ==================
 String webpage() {
 
   String soilStatus = (soil > 2500) ? "DRY" : "WET";
@@ -224,14 +213,12 @@ button {
   return html;
 }
 
-// ================== ROUTES ==================
 void handleRoot(){ server.send(200,"text/html",webpage()); }
 void handleAuto(){ autoMode=true; handleRoot(); }
 void handleManual(){ autoMode=false; handleRoot(); }
 void handleOn(){ if(!autoMode) pump=true; handleRoot(); }
 void handleOff(){ if(!autoMode) pump=false; handleRoot(); }
 
-// ================== SETUP ==================
 void setup() {
   Serial.begin(115200);
 
@@ -251,7 +238,6 @@ void setup() {
   server.begin();
 }
 
-// ================== LOOP ==================
 unsigned long lastWeather = 0;
 
 void loop() {
@@ -261,7 +247,6 @@ void loop() {
 
   readSensors();
 
-  // 10 sec (change to 600000 for final demo)
   if (wifiOK && millis() - lastWeather > 10000) {
     fetchWeather();
     lastWeather = millis();
